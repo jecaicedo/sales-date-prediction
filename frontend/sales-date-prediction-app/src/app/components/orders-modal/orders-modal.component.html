@@ -1,0 +1,103 @@
+<div *ngIf="isOpen" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ customer?.customerName }} - Orders</h3>
+    </div>
+    
+    <div class="modal-body">
+      <div *ngIf="isLoading()" class="loading-container">
+        <mat-spinner></mat-spinner>
+        <p>Loading orders...</p>
+      </div>
+
+      <div *ngIf="!isLoading() && displayedOrders().length > 0" class="table-container">
+        <table mat-table [dataSource]="displayedOrders()" matSort (matSortChange)="onSortChange($event)" class="orders-table">
+          
+          <ng-container matColumnDef="orderID">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Order ID
+              <span *ngIf="sortField === 'orderID'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let order">{{ order.orderID }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="requiredDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Required Date
+              <span *ngIf="sortField === 'requiredDate'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let order">{{ formatDate(order.requiredDate) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="shippedDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Shipped Date
+              <span *ngIf="sortField === 'shippedDate'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let order">{{ formatDate(order.shippedDate) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="shipName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Ship Name
+              <span *ngIf="sortField === 'shipName'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let order">{{ order.shipName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="shipAddress">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Ship Address
+              <span *ngIf="sortField === 'shipAddress'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let order">{{ order.shipAddress }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="shipCity">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+              Ship City
+              <span *ngIf="sortField === 'shipCity'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <td mat-cell *matCellDef="let order">{{ order.shipCity }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div class="pagination-container">
+          <mat-paginator
+            [length]="totalItems"
+            [pageSize]="pageSize"
+            [pageIndex]="pageIndex"
+            [pageSizeOptions]="[5, 10, 25]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons
+            class="pagination">
+          </mat-paginator>
+          
+          <span (click)="closeModal()" class="close-text">
+            CLOSE
+          </span>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading() && allOrders().length === 0" class="no-orders">
+        <mat-icon>shopping_cart</mat-icon>
+        <p>No orders found for this customer.</p>
+      </div>
+    </div>
+  </div>
+</div>

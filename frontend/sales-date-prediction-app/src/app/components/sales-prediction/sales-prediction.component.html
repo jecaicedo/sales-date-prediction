@@ -1,0 +1,109 @@
+<div class="sales-prediction-container">
+  <div class="header">
+    <div class="header-content">
+      <h1 class="app-title">Sales Date Prediction App</h1>
+      <div class="logo">
+        <img src="/nserio_logo.png" alt="NSERIO Logo" class="logo-image">
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="content-header">
+      <h2 class="section-title">Customers</h2>
+      <div class="search-container">
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Customer Name"
+          (input)="onSearchChange($event)"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading()" class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
+
+    <div *ngIf="!isLoading()" class="table-container">
+      <table mat-table [dataSource]="filteredCustomers()" matSort (matSortChange)="onSortChange($event)" class="customers-table">
+        
+        <ng-container matColumnDef="customerName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Customer Name
+            <span *ngIf="sortField === 'customerName'" class="sort-indicator">
+              {{ sortDirection === 'asc' ? '↑' : '↓' }}
+            </span>
+          </th>
+          <td mat-cell *matCellDef="let customer">{{ customer.customerName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="lastOrderDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Last Order Date
+            <span *ngIf="sortField === 'lastOrderDate'" class="sort-indicator">
+              {{ sortDirection === 'asc' ? '↑' : '↓' }}
+            </span>
+          </th>
+          <td mat-cell *matCellDef="let customer">{{ formatDate(customer.lastOrderDate) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="nextPredictedOrder">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Next Predicted Order
+            <span *ngIf="sortField === 'nextPredictedOrder'" class="sort-indicator">
+              {{ sortDirection === 'asc' ? '↑' : '↓' }}
+            </span>
+          </th>
+          <td mat-cell *matCellDef="let customer">{{ formatDate(customer.nextPredictedOrder) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let customer">
+            <div class="action-buttons">
+              <span 
+                class="view-orders-text"
+                (click)="viewOrders(customer)"
+              >
+                VIEW ORDERS
+              </span>
+              <span 
+                class="new-order-text"
+                (click)="newOrder(customer)"
+              >
+                NEW ORDER
+              </span>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+        class="pagination">
+      </mat-paginator>
+    </div>
+  </div>
+
+  <app-orders-modal 
+    [customer]="selectedCustomer"
+    [isOpen]="showOrdersModal"
+    (modalClose)="closeModals()">
+  </app-orders-modal>
+
+  <app-new-order-modal 
+    [customer]="selectedCustomer"
+    [isOpen]="showNewOrderModal"
+    (modalClose)="closeModals()">
+  </app-new-order-modal>
+</div>
